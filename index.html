@@ -45,66 +45,268 @@ button.action{min-height:clamp(48px,7.8vh,66px);border:0;border-radius:16px;padd
   <div class="key"><span class="dot" style="background:#e44747"></span> Red = Below the blue line</div>
 </div>
 </main>
-<script>
+<<script>
 (()=>{
  const canvas=document.getElementById('pad');
  const ctx=canvas.getContext('2d');
  const feedback=document.getElementById('feedback');
  const green='#20a45a',red='#e44747';
+
  let W=0,H=0,rows=[],strokes=[],current=null;
+ let activePointer=null;
+
  const left=0.105,right=0.97;
+
+ // Thinner, more natural handwriting
+ const PEN_WIDTH=1.8;
+
  function resize(){
    const r=canvas.getBoundingClientRect();
    const dpr=Math.max(1,window.devicePixelRatio||1);
-   W=r.width;H=r.height;
-   canvas.width=Math.round(W*dpr);canvas.height=Math.round(H*dpr);
+
+   W=r.width;
+   H=r.height;
+
+   canvas.width=Math.round(W*dpr);
+   canvas.height=Math.round(H*dpr);
+
    ctx.setTransform(dpr,0,0,dpr,0,0);
+
    const count=Math.max(5,Math.min(11,Math.floor(H/43)));
    const step=H/(count+0.35);
+
    rows=Array.from({length:count},(_,i)=>step*(i+1));
+
    drawPage();
  }
+
  function drawPage(){
-   ctx.clearRect(0,0,W,H);ctx.fillStyle='#fffefa';ctx.fillRect(0,0,W,H);
+   ctx.clearRect(0,0,W,H);
+   ctx.fillStyle='#fffefa';
+   ctx.fillRect(0,0,W,H);
+
    const x1=W*left,x2=W*right;
-   ctx.strokeStyle='#e7a4a4';ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(W*.075,0);ctx.lineTo(W*.075,H);ctx.stroke();
+
+   ctx.strokeStyle='#e7a4a4';
+   ctx.lineWidth=1.5;
+   ctx.beginPath();
+   ctx.moveTo(W*.075,0);
+   ctx.lineTo(W*.075,H);
+   ctx.stroke();
+
    rows.forEach(y=>{
-     ctx.save();ctx.setLineDash([7,6]);ctx.lineWidth=1.5;ctx.strokeStyle='#b8c7d9';
-     ctx.beginPath();ctx.moveTo(x1,Math.max(2,y-30));ctx.lineTo(x2,Math.max(2,y-30));ctx.stroke();
-     ctx.setLineDash([]);ctx.strokeStyle='#9bb6d2';ctx.lineWidth=1.3;
-     ctx.beginPath();ctx.moveTo(x1,y-15);ctx.lineTo(x2,y-15);ctx.stroke();
-     ctx.strokeStyle='#3989df';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(x1,y);ctx.lineTo(x2,y);ctx.stroke();
+     ctx.save();
+
+     ctx.setLineDash([7,6]);
+     ctx.lineWidth=1.5;
+     ctx.strokeStyle='#b8c7d9';
+
+     ctx.beginPath();
+     ctx.moveTo(x1,Math.max(2,y-30));
+     ctx.lineTo(x2,Math.max(2,y-30));
+     ctx.stroke();
+
+     ctx.setLineDash([]);
+     ctx.strokeStyle='#9bb6d2';
+     ctx.lineWidth=1.3;
+
+     ctx.beginPath();
+     ctx.moveTo(x1,y-15);
+     ctx.lineTo(x2,y-15);
+     ctx.stroke();
+
+     ctx.strokeStyle='#3989df';
+     ctx.lineWidth=3;
+
+     ctx.beginPath();
+     ctx.moveTo(x1,y);
+     ctx.lineTo(x2,y);
+     ctx.stroke();
+
      ctx.restore();
    });
-   strokes.forEach(drawStroke);if(current)drawStroke(current);
+
+   strokes.forEach(drawStroke);
+
+   if(current)drawStroke(current);
  }
+
  function drawStroke(s){
-   const p=s.points;if(!p.length)return;
-   ctx.lineCap='round';ctx.lineJoin='round';ctx.lineWidth=Math.max(4,Math.min(8,W*.009));
-   if(p.length===1){ctx.beginPath();ctx.arc(p[0].x,p[0].y,ctx.lineWidth/2,0,Math.PI*2);ctx.fillStyle=p[0].y<=rows[s.row]?green:red;ctx.fill();return;}
+   const p=s.points;
+   if(!p.length)return;
+
+   ctx.lineCap='round';
+   ctx.lineJoin='round';
+   ctx.lineWidth=PEN_WIDTH;
+
+   if(p.length===1){
+     ctx.beginPath();
+     ctx.arc(p[0].x,p[0].y,PEN_WIDTH/2,0,Math.PI*2);
+     ctx.fillStyle=p[0].y<=rows[s.row]?green:red;
+     ctx.fill();
+     return;
+   }
+
    for(let i=1;i<p.length;i++){
-     const a=p[i-1],b=p[i];ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);
-     ctx.strokeStyle=(a.y<=rows[s.row]&&b.y<=rows[s.row])?green:red;ctx.stroke();
+     const a=p[i-1],b=p[i];
+
+     ctx.beginPath();
+     ctx.moveTo(a.x,a.y);
+     ctx.lineTo(b.x,b.y);
+
+     ctx.strokeStyle=
+       (a.y<=rows[s.row]&&b.y<=rows[s.row])
+       ?green:red;
+
+     ctx.stroke();
    }
  }
- function point(e){const r=canvas.getBoundingClientRect();return{x:e.clientX-r.left,y:e.clientY-r.top};}
- function message(below,done=false){
-   feedback.textContent=below?'Keep your writing on or above the blue line. You can do it!':done?'🌟 Wonderful writing! Keep practising!':'🌟 Great job! You are staying above the line!';
-   feedback.style.background=below?'#ffebeb':'#e4f8e9';feedback.style.color=below?'#b82f2f':'#18763b';
+
+ function point(e){
+   const r=canvas.getBoundingClientRect();
+
+   return{
+     x:e.clientX-r.left,
+     y:e.clientY-r.top
+   };
  }
+
+ function message(below,done=false){
+   feedback.textContent=below
+     ?'Keep your writing on or above the blue line. You can do it!'
+     :done
+       ?'🌟 Wonderful writing! Keep practising!'
+       :'🌟 Great job! You are staying above the line!';
+
+   feedback.style.background=below?'#ffebeb':'#e4f8e9';
+   feedback.style.color=below?'#b82f2f':'#18763b';
+ }
+
+ // Only Apple Pencil input can create handwriting.
+ // Finger and palm touches are ignored.
+
  canvas.addEventListener('pointerdown',e=>{
-   e.preventDefault();const p=point(e);let row=0,best=Infinity;
-   rows.forEach((y,i)=>{const d=Math.abs(p.y-y);if(d<best){best=d;row=i;}});
-   current={row,points:[p]};canvas.setPointerCapture(e.pointerId);drawPage();message(p.y>rows[row]);
+
+   if(e.pointerType!=='pen')return;
+
+   if(activePointer!==null)return;
+
+   e.preventDefault();
+
+   activePointer=e.pointerId;
+
+   const p=point(e);
+
+   let row=0,best=Infinity;
+
+   rows.forEach((y,i)=>{
+     const d=Math.abs(p.y-y);
+
+     if(d<best){
+       best=d;
+       row=i;
+     }
+   });
+
+   current={
+     row,
+     points:[p]
+   };
+
+   canvas.setPointerCapture(e.pointerId);
+
+   drawPage();
+   message(p.y>rows[row]);
+
  });
- canvas.addEventListener('pointermove',e=>{if(!current)return;e.preventDefault();current.points.push(point(e));drawPage();message(current.points.some(p=>p.y>rows[current.row]));});
- function finish(){if(!current)return;const below=current.points.some(p=>p.y>rows[current.row]);strokes.push(current);current=null;drawPage();message(below,!below);}
- canvas.addEventListener('pointerup',finish);canvas.addEventListener('pointercancel',finish);
- document.getElementById('clear').addEventListener('click',()=>{strokes=[];current=null;drawPage();message(false);feedback.textContent='🌟 Ready? Start writing!';});
- document.getElementById('fresh').addEventListener('click',()=>{strokes=[];current=null;drawPage();message(false);feedback.textContent='✨ Fresh page! Have another go!';});
- let resizeTimer;window.addEventListener('resize',()=>{clearTimeout(resizeTimer);resizeTimer=setTimeout(resize,100);});
- if('ResizeObserver'in window)new ResizeObserver(resize).observe(canvas.parentElement);else window.addEventListener('orientationchange',resize);
+
+ canvas.addEventListener('pointermove',e=>{
+
+   if(e.pointerType!=='pen')return;
+   if(activePointer!==e.pointerId)return;
+   if(!current)return;
+
+   e.preventDefault();
+
+   current.points.push(point(e));
+
+   drawPage();
+
+   message(
+     current.points.some(p=>p.y>rows[current.row])
+   );
+
+ });
+
+ function finish(e){
+
+   if(activePointer!==e.pointerId)return;
+
+   if(!current){
+     activePointer=null;
+     return;
+   }
+
+   const below=current.points.some(
+     p=>p.y>rows[current.row]
+   );
+
+   strokes.push(current);
+
+   current=null;
+   activePointer=null;
+
+   drawPage();
+
+   message(below,!below);
+ }
+
+ canvas.addEventListener('pointerup',finish);
+ canvas.addEventListener('pointercancel',finish);
+
+ canvas.addEventListener('lostpointercapture',e=>{
+   if(activePointer===e.pointerId){
+     finish(e);
+   }
+ });
+
+ document.getElementById('clear').addEventListener('click',()=>{
+   strokes=[];
+   current=null;
+   activePointer=null;
+
+   drawPage();
+   message(false);
+
+   feedback.textContent='🌟 Ready? Start writing!';
+ });
+
+ document.getElementById('fresh').addEventListener('click',()=>{
+   strokes=[];
+   current=null;
+   activePointer=null;
+
+   drawPage();
+   message(false);
+
+   feedback.textContent='✨ Fresh page! Have another go!';
+ });
+
+ let resizeTimer;
+
+ window.addEventListener('resize',()=>{
+   clearTimeout(resizeTimer);
+   resizeTimer=setTimeout(resize,100);
+ });
+
+ if('ResizeObserver'in window){
+   new ResizeObserver(resize).observe(canvas.parentElement);
+ }else{
+   window.addEventListener('orientationchange',resize);
+ }
+
  resize();
+
 })();
 </script>
 </body>
