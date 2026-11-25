@@ -2,67 +2,110 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="theme-color" content="#fffefa">
+<meta name="theme-color" content="#f2f7ff">
 <title>My Writing Pad</title>
 <style>
-*{box-sizing:border-box}body{margin:0;padding:18px 13px 28px;background:#f5f7fb;color:#243247;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
-main{max-width:850px;margin:auto}header{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}h1{font-size:27px;margin:0 0 4px}.sub{font-size:14px;color:#65738a}.rainbow{font-size:34px}
-.toolbar{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:12px 0}.toolbar strong{font-size:14px}.colors{display:flex;gap:8px}.color{border:2px solid #dbe2eb;background:white;border-radius:50%;width:39px;height:39px;font-size:20px;padding:0}.color.selected{outline:3px solid #9cc8f3;outline-offset:2px}
-.paper{background:#fffefa;border:1px solid #e5dfd2;border-radius:15px;overflow:hidden;box-shadow:0 5px 18px #24324712;touch-action:none;position:relative}
-canvas{display:block;width:100%;height:auto;touch-action:none}
-.feedback{margin:13px 0;padding:13px;border-radius:13px;text-align:center;font-size:15px;font-weight:700;background:#e7f7e9;color:#18763b;min-height:47px}
-.actions{display:grid;grid-template-columns:1fr 1fr;gap:9px}button.action{border:0;border-radius:12px;padding:14px 10px;font-size:15px;font-weight:700}.primary{background:#2678d5;color:white}.secondary{background:#e8edf4;color:#26364c}
-.legend{margin-top:15px;padding:14px;background:white;border:1px solid #e5eaf0;border-radius:14px}.legend h2{font-size:16px;margin:0 0 10px}.key{display:flex;align-items:center;gap:9px;margin:8px 0;font-size:14px}.dot{width:14px;height:14px;border-radius:50%;display:inline-block;flex:none}.tip{font-size:13px;color:#65738a;margin:12px 0 0;line-height:1.45}
+:root{--ink:#20314b;--blue:#3989df;--green:#20a45a;--red:#e44747}
+*{box-sizing:border-box}
+html,body{width:100%;height:100%;margin:0;overflow:hidden}
+body{background:linear-gradient(145deg,#eaf3ff,#fff8e8);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;overscroll-behavior:none}
+main{height:100vh;height:100dvh;width:96%;max-width:1200px;margin:0 auto;padding:clamp(7px,1.4vh,15px) 0;display:flex;flex-direction:column;gap:clamp(6px,1vh,11px);min-height:0}
+header{display:flex;align-items:center;justify-content:space-between;flex:none;min-height:42px}
+h1{font-size:clamp(21px,3.1vh,32px);line-height:1.05;margin:0;font-weight:850;letter-spacing:-.5px}
+.sub{font-size:clamp(11px,1.7vh,15px);font-weight:600;color:#60718a;margin-top:3px}
+.rainbow{font-size:clamp(27px,4.5vh,42px);line-height:1}
+.paper{flex:1;min-height:0;background:#fffefa;border:2px solid #dce6f2;border-radius:clamp(12px,2vh,20px);overflow:hidden;box-shadow:0 5px 20px #294b7118;touch-action:none;position:relative}
+canvas{display:block;width:100%;height:100%;touch-action:none}
+.feedback{flex:none;min-height:clamp(38px,6vh,54px);padding:7px 12px;border-radius:14px;display:flex;align-items:center;justify-content:center;text-align:center;font-size:clamp(12px,1.9vh,16px);font-weight:800;background:#e4f8e9;color:#18763b}
+.actions{flex:none;display:grid;grid-template-columns:1fr 1fr;gap:clamp(8px,1.5vw,14px)}
+button.action{min-height:clamp(48px,7.8vh,66px);border:0;border-radius:16px;padding:8px 10px;font-size:clamp(14px,2.1vh,18px);font-weight:850;box-shadow:0 4px 0 #00000016;touch-action:manipulation}
+.primary{background:#287fe0;color:white}.secondary{background:#ffca55;color:#533900}
+.legend{flex:none;display:flex;justify-content:center;align-items:center;gap:clamp(10px,3vw,28px);padding:3px 0 1px;font-size:clamp(10px,1.6vh,14px);font-weight:750;white-space:nowrap}
+.key{display:flex;align-items:center;gap:6px}.dot{width:clamp(10px,1.5vh,14px);height:clamp(10px,1.5vh,14px);border-radius:50%;display:inline-block;flex:none}
+@media (orientation:landscape) and (max-height:500px){main{padding:5px 0;gap:5px}header{min-height:32px}h1{font-size:21px}.sub{font-size:11px}.rainbow{font-size:25px}.feedback{min-height:31px;padding:4px;font-size:12px}button.action{min-height:39px;font-size:14px}.legend{font-size:10px}}
 </style>
 </head>
-<body><main>
-<header><div><h1>✏️ My Writing Pad</h1><div class="sub">Practise writing neatly on the lines!</div></div><div class="rainbow">🌈</div></header>
-<div class="toolbar"><strong>Choose your pen colour</strong><div class="colors">
-<button class="color selected" data-pen="#2378d4" aria-label="Blue pen">🔵</button><button class="color" data-pen="#9b62d1" aria-label="Purple pen">🟣</button><button class="color" data-pen="#ed8b32" aria-label="Orange pen">🟠</button>
-</div></div>
-<div class="paper"><canvas id="pad" width="900" height="680" aria-label="Writing practice paper. Write with your finger or Apple Pencil."></canvas></div>
+<body>
+<main>
+<header>
+  <div><h1>✏️ My Writing Pad</h1><div class="sub">Practise writing neatly on the lines!</div></div>
+  <div class="rainbow" aria-hidden="true">🌈</div>
+</header>
+<div class="paper"><canvas id="pad" aria-label="Writing practice paper. Write with your finger or Apple Pencil."></canvas></div>
 <div class="feedback" id="feedback" role="status" aria-live="polite">🌟 Ready? Start writing!</div>
-<div class="actions"><button class="action primary" id="clear">↻ Start again</button><button class="action secondary" id="fresh">New writing lines</button></div>
-<section class="legend"><h2>What do the colours mean?</h2>
-<div class="key"><span class="dot" style="background:#24a45a"></span> Green = Great! Your writing stays on or above the blue line.</div>
-<div class="key"><span class="dot" style="background:#e34b4b"></span> Red = Oops! Your writing went below the blue line.</div>
-<p class="tip">Tip: Let the bottom of your letters rest on the blue writing line. Write with your finger or Apple Pencil.</p></section>
+<div class="actions">
+  <button class="action primary" id="clear">↻ Start again</button>
+  <button class="action secondary" id="fresh">✨ New writing lines</button>
+</div>
+<div class="legend" aria-label="Writing colour guide">
+  <div class="key"><span class="dot" style="background:#20a45a"></span> Green = On or above the blue line</div>
+  <div class="key"><span class="dot" style="background:#e44747"></span> Red = Below the blue line</div>
+</div>
 </main>
 <script>
-(function(){
-const canvas=document.getElementById('pad'),ctx=canvas.getContext('2d'),feedback=document.getElementById('feedback');
-const W=900,H=680,rows=[170,340,510],green='#24a45a',red='#e34b4b';
-let strokes=[],current=null,pen='#2378d4';
-function drawPage(){
- ctx.clearRect(0,0,W,H);ctx.fillStyle='#fffefa';ctx.fillRect(0,0,W,H);
- ctx.fillStyle='#e8a4a4';ctx.fillRect(70,0,2,H);
- rows.forEach(y=>{
-  ctx.save();ctx.setLineDash([9,7]);ctx.lineWidth=2;ctx.strokeStyle='#b9c6d8';
-  ctx.beginPath();ctx.moveTo(75,y-65);ctx.lineTo(875,y-65);ctx.stroke();
-  ctx.strokeStyle='#9ab2ce';ctx.beginPath();ctx.moveTo(75,y-32);ctx.lineTo(875,y-32);ctx.stroke();ctx.restore();
-  ctx.strokeStyle='#4d91cc';ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(75,y);ctx.lineTo(875,y);ctx.stroke();
-  ctx.fillStyle='#7196b8';ctx.font='19px sans-serif';ctx.fillText('✎',35,y+6);
+(()=>{
+ const canvas=document.getElementById('pad');
+ const ctx=canvas.getContext('2d');
+ const feedback=document.getElementById('feedback');
+ const green='#20a45a',red='#e44747';
+ let W=0,H=0,rows=[],strokes=[],current=null;
+ const left=0.105,right=0.97;
+ function resize(){
+   const r=canvas.getBoundingClientRect();
+   const dpr=Math.max(1,window.devicePixelRatio||1);
+   W=r.width;H=r.height;
+   canvas.width=Math.round(W*dpr);canvas.height=Math.round(H*dpr);
+   ctx.setTransform(dpr,0,0,dpr,0,0);
+   const count=Math.max(5,Math.min(11,Math.floor(H/43)));
+   const step=H/(count+0.35);
+   rows=Array.from({length:count},(_,i)=>step*(i+1));
+   drawPage();
+ }
+ function drawPage(){
+   ctx.clearRect(0,0,W,H);ctx.fillStyle='#fffefa';ctx.fillRect(0,0,W,H);
+   const x1=W*left,x2=W*right;
+   ctx.strokeStyle='#e7a4a4';ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(W*.075,0);ctx.lineTo(W*.075,H);ctx.stroke();
+   rows.forEach(y=>{
+     ctx.save();ctx.setLineDash([7,6]);ctx.lineWidth=1.5;ctx.strokeStyle='#b8c7d9';
+     ctx.beginPath();ctx.moveTo(x1,Math.max(2,y-30));ctx.lineTo(x2,Math.max(2,y-30));ctx.stroke();
+     ctx.setLineDash([]);ctx.strokeStyle='#9bb6d2';ctx.lineWidth=1.3;
+     ctx.beginPath();ctx.moveTo(x1,y-15);ctx.lineTo(x2,y-15);ctx.stroke();
+     ctx.strokeStyle='#3989df';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(x1,y);ctx.lineTo(x2,y);ctx.stroke();
+     ctx.restore();
+   });
+   strokes.forEach(drawStroke);if(current)drawStroke(current);
+ }
+ function drawStroke(s){
+   const p=s.points;if(!p.length)return;
+   ctx.lineCap='round';ctx.lineJoin='round';ctx.lineWidth=Math.max(4,Math.min(8,W*.009));
+   if(p.length===1){ctx.beginPath();ctx.arc(p[0].x,p[0].y,ctx.lineWidth/2,0,Math.PI*2);ctx.fillStyle=p[0].y<=rows[s.row]?green:red;ctx.fill();return;}
+   for(let i=1;i<p.length;i++){
+     const a=p[i-1],b=p[i];ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);
+     ctx.strokeStyle=(a.y<=rows[s.row]&&b.y<=rows[s.row])?green:red;ctx.stroke();
+   }
+ }
+ function point(e){const r=canvas.getBoundingClientRect();return{x:e.clientX-r.left,y:e.clientY-r.top};}
+ function message(below,done=false){
+   feedback.textContent=below?'Keep your writing on or above the blue line. You can do it!':done?'🌟 Wonderful writing! Keep practising!':'🌟 Great job! You are staying above the line!';
+   feedback.style.background=below?'#ffebeb':'#e4f8e9';feedback.style.color=below?'#b82f2f':'#18763b';
+ }
+ canvas.addEventListener('pointerdown',e=>{
+   e.preventDefault();const p=point(e);let row=0,best=Infinity;
+   rows.forEach((y,i)=>{const d=Math.abs(p.y-y);if(d<best){best=d;row=i;}});
+   current={row,points:[p]};canvas.setPointerCapture(e.pointerId);drawPage();message(p.y>rows[row]);
  });
- strokes.forEach(drawStroke);if(current)drawStroke(current);
-}
-function drawStroke(s){
- const p=s.points;if(!p.length)return;
- if(p.length===1){ctx.beginPath();ctx.arc(p[0].x,p[0].y,4,0,Math.PI*2);ctx.fillStyle=p[0].y<=rows[s.row]?green:red;ctx.fill();return;}
- for(let i=1;i<p.length;i++){const a=p[i-1],b=p[i];ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);
- ctx.strokeStyle=(a.y<=rows[s.row]&&b.y<=rows[s.row])?green:red;ctx.lineWidth=9;ctx.lineCap='round';ctx.lineJoin='round';ctx.stroke();}
-}
-function point(e){const r=canvas.getBoundingClientRect();return{x:(e.clientX-r.left)*W/r.width,y:(e.clientY-r.top)*H/r.height};}
-function message(below){feedback.textContent=below?'Try to keep your writing above the blue line. You can do it!':'🌟 Great job! You are staying above the line!';feedback.style.background=below?'#fde8e7':'#e7f7e9';feedback.style.color=below?'#b82f2f':'#18763b';}
-canvas.addEventListener('pointerdown',e=>{e.preventDefault();const p=point(e);let row=0,best=Infinity;rows.forEach((y,i)=>{let d=Math.abs(p.y-y);if(d<best){best=d;row=i;}});current={row,points:[p]};canvas.setPointerCapture(e.pointerId);drawPage();message(p.y>rows[row]);});
-canvas.addEventListener('pointermove',e=>{if(!current)return;e.preventDefault();current.points.push(point(e));drawPage();message(current.points.some(p=>p.y>rows[current.row]));});
-function finish(){if(!current)return;const below=current.points.some(p=>p.y>rows[current.row]);strokes.push(current);current=null;drawPage();if(below)message(true);else{feedback.textContent='🌟 Wonderful writing! Keep practising!';feedback.style.background='#e7f7e9';feedback.style.color='#18763b';}}
-canvas.addEventListener('pointerup',finish);canvas.addEventListener('pointercancel',finish);
-document.getElementById('clear').addEventListener('click',()=>{strokes=[];current=null;feedback.textContent='🌟 Ready? Start writing!';feedback.style.background='#e7f7e9';feedback.style.color='#18763b';drawPage();});
-document.getElementById('fresh').addEventListener('click',()=>{strokes=[];current=null;feedback.textContent='✨ Fresh page! Have another go!';feedback.style.background='#e7f7e9';feedback.style.color='#18763b';drawPage();});
-document.querySelectorAll('[data-pen]').forEach(b=>b.addEventListener('click',()=>{pen=b.dataset.pen;document.querySelectorAll('[data-pen]').forEach(x=>x.classList.toggle('selected',x===b));}));
-drawPage();
+ canvas.addEventListener('pointermove',e=>{if(!current)return;e.preventDefault();current.points.push(point(e));drawPage();message(current.points.some(p=>p.y>rows[current.row]));});
+ function finish(){if(!current)return;const below=current.points.some(p=>p.y>rows[current.row]);strokes.push(current);current=null;drawPage();message(below,!below);}
+ canvas.addEventListener('pointerup',finish);canvas.addEventListener('pointercancel',finish);
+ document.getElementById('clear').addEventListener('click',()=>{strokes=[];current=null;drawPage();message(false);feedback.textContent='🌟 Ready? Start writing!';});
+ document.getElementById('fresh').addEventListener('click',()=>{strokes=[];current=null;drawPage();message(false);feedback.textContent='✨ Fresh page! Have another go!';});
+ let resizeTimer;window.addEventListener('resize',()=>{clearTimeout(resizeTimer);resizeTimer=setTimeout(resize,100);});
+ if('ResizeObserver'in window)new ResizeObserver(resize).observe(canvas.parentElement);else window.addEventListener('orientationchange',resize);
+ resize();
 })();
-</script></body></html>
+</script>
+</body>
+</html>
